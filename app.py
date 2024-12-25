@@ -9,7 +9,7 @@ import requests
 app = Flask(__name__)
 
 # 設定資料庫連結
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://admin:123456@127.0.0.1:5432/linebot_db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://admin:123456@10.186.1.103,:5432/linebot_db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
