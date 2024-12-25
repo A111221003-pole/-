@@ -49,7 +49,7 @@ def callback():
     signature = request.headers['X-Line-Signature']
     body = request.get_data(as_text=True)
     handler.handle(body, signature)
-    return 'OK'
+    return 'OK', 200
 
 # 訊息處理函數
 @handler.add(MessageEvent, message=TextMessage)
