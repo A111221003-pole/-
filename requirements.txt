@@ -1,0 +1,6 @@
+flask
+sqlalchemy
+psycopg2
+line-bot-sdk
+requests
+gunicorn
