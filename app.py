@@ -14,8 +14,6 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
 # Line Bot 設定
-LINE_CHANNEL_ACCESS_TOKEN = '/cuCbOZ42TY8UOVjqSg7L/X2nk955E9emuWqqz6F1Gj2/90Ir0CbWu/jPNexfxFu+NcJmZv5LDbYmrZjwOjZ/PZgGsS4XcxFaYM8NS6hfsaOs+VEzm0/ddZUYh4yLhXRvQ+aRH24ZGcocSr7KezzzAdB04t89/1O/w1cDnyilFU='
-LINE_CHANNEL_SECRET = 'f021ff0c04ee67be09a39d54f1ba7ae6'
 line_bot_api = LineBotApi('/cuCbOZ42TY8UOVjqSg7L/X2nk955E9emuWqqz6F1Gj2/90Ir0CbWu/jPNexfxFu+NcJmZv5LDbYmrZjwOjZ/PZgGsS4XcxFaYM8NS6hfsaOs+VEzm0/ddZUYh4yLhXRvQ+aRH24ZGcocSr7KezzzAdB04t89/1O/w1cDnyilFU=')
 handler = WebhookHandler('f021ff0c04ee67be09a39d54f1ba7ae6')
 
@@ -35,7 +33,7 @@ class Finance(db.Model):
 
 # 定義天氣查詢函數
 def get_weather(city):
-    api_key = 'e796a6d3793279e37400105ffe95c29b'
+    api_key = os.getenv('d0f640ceb3279f6110c07fbd0d4b1b61')
     url = f"http://api.openweathermap.org/data/2.5/weather?q={city}&appid={api_key}&units=metric"
     response = requests.get(url).json()
     if response.get("main"):
@@ -110,5 +108,9 @@ def handle_message(event):
 # 初始化資料表並啟動應用程式
 if __name__ == "__main__":
     with app.app_context():
-        db.create_all()  # 建立資料表
+        try:
+            db.create_all()  # 創建資料表
+            print("Database connected successfully!")
+        except Exception as e:
+            print(f"Error connecting to database: {e}")
     app.run(host='0.0.0.0', port=5000, debug=True)
