@@ -3,6 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from linebot import LineBotApi, WebhookHandler
 from linebot.models import MessageEvent, TextMessage, TextSendMessage
 import os
+import datetime
 import requests
 
 # 初始化 Flask 應用程式
