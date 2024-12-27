@@ -9,7 +9,7 @@ import requests
 app = Flask(__name__)
 
 # 設定資料庫連結
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://linebotproject:rzcT8LvNQNBGEPaGcrtaXhwErZy7uv9m@dpg-ctmki4bv2p9s73fcbnmg-a/linebotproject'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://linebotproject:rzcT8LvNQNBGEPaGcrtaXhwErZy7uv9m@dpg-ctmki4bv2p9s73fcbnmg-a.oregon-postgres.render.com/linebotproject'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
@@ -31,17 +31,11 @@ class Finance(db.Model):
     category = db.Column(db.String(50))
     timestamp = db.Column(db.DateTime, default=db.func.now())
 
-# 定義天氣查詢函數
-def get_weather(city):
-    api_key = os.getenv('d0f640ceb3279f6110c07fbd0d4b1b61')
-    url = f"http://api.openweathermap.org/data/2.5/weather?q={city}&appid={api_key}&units=metric"
-    response = requests.get(url).json()
-    if response.get("main"):
-        temp = response["main"]["temp"]
-        weather = response["weather"][0]["description"]
-        return f"{city} 現在的天氣是：{weather}，溫度為 {temp}°C。"
-    else:
-        return "無法查詢天氣，請確認城市名稱是否正確。"
+# 定義倒數日功能
+def get_countdown(target_date):
+    today = datetime.date.today()
+    days_left = (target_date - today).days
+    return f"距離 {target_date.strftime('%Y-%m-%d')} 還有 {days_left} 天！"
 
 # Webhook 路由
 @app.route("/callback", methods=['POST'])
@@ -67,9 +61,12 @@ def handle_message(event):
         todos = Todo.query.filter_by(user_id=event.source.user_id, status=False).all()
         reply = "\n".join([f"{i+1}. {todo.content}" for i, todo in enumerate(todos)]) if todos else "目前沒有待辦事項。"
 
-    elif text.startswith("查天氣"):
-        city = text.replace("查天氣 ", "")
-        reply = get_weather(city)
+    elif text.startswith("倒數日"):
+        try:
+            target_date = datetime.datetime.strptime(text.replace("倒數日 ", ""), '%Y-%m-%d').date()
+            reply = get_countdown(target_date)
+        except ValueError:
+            reply = "請輸入正確的日期格式，例如：倒數日 2024-12-31"
 
     elif text.startswith("記錄支出"):
         parts = text.split(" ")
@@ -101,7 +98,7 @@ def handle_message(event):
         reply = f"你的總餘額為：{total} 元"
 
     else:
-        reply = "請輸入正確的指令，如：新增待辦、查詢待辦、查天氣、記錄支出、記錄收入、查詢財務等。"
+        reply = "請輸入正確的指令，如：新增待辦、查詢待辦、倒數日 YYYY-MM-DD、記錄支出、記錄收入、查詢財務等。"
 
     line_bot_api.reply_message(event.reply_token, TextSendMessage(text=reply))
 
@@ -110,7 +107,7 @@ if __name__ == "__main__":
     with app.app_context():
         try:
             db.create_all()  # 創建資料表
-            print("Database connected successfully!")
+            print("Database connected and tables created successfully!")
         except Exception as e:
-            print(f"Error connecting to database: {e}")
+            print(f"Error connecting to database or creating tables: {e}")
     app.run(host='0.0.0.0', port=5000, debug=True)
