@@ -105,9 +105,10 @@ def handle_message(event):
 # 初始化資料表並啟動應用程式
 if __name__ == "__main__":
     with app.app_context():
-        try:
-            db.create_all()  # 創建資料表
-            print("Database connected and tables created successfully!")
-        except Exception as e:
-            print(f"Error connecting to database or creating tables: {e}")
-    app.run(host='0.0.0.0', port=5000, debug=True)
+        if os.getenv("INIT_DB", "false").lower() == "true":
+            try:
+                db.create_all()  # 創建資料表
+                print("Database tables created successfully!")
+            except Exception as e:
+                print(f"Error creating database tables: {e}")
+        app.run(host='0.0.0.0', port=5000, debug=True)
