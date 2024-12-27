@@ -1,7 +1,5 @@
-flask
-flask_sqlalchemy
-sqlalchemy
+Flask
+Flask-SQLAlchemy
 psycopg2
-line-bot-sdk
-requests
+line-bot-sdk==1.18.0
 gunicorn
